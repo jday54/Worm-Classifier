@@ -1,3 +1,5 @@
+# Source: https://towardsdatascience.com/a-practical-example-in-transfer-learning-with-pytorch-846bb835f2db
+
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
