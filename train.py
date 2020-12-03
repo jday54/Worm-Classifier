@@ -8,11 +8,10 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 import torchvision.transforms as transforms
 
-# train_dataset = datasets.ImageFolder('trainingimgs/train')
-# test_dataset = datasets.ImageFolder('trainingimgs/test')
 
+# Load dataset
 dataset = datasets.ImageFolder(
-    'trainingimgs/train',
+    'image_data/all_images',
     transforms.Compose([
         transforms.ColorJitter(0.1, 0.1, 0.1, 0.1),
         transforms.Resize((224, 224)),
@@ -21,7 +20,6 @@ dataset = datasets.ImageFolder(
     ])
 )
 train_dataset, test_dataset = torch.utils.data.random_split(dataset, [len(dataset) - 20, 20])
-
 
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
@@ -38,6 +36,7 @@ test_loader = torch.utils.data.DataLoader(
 )
 
 
+# Declare model
 model = models.alexnet(pretrained=True)
 model.classifier[6] = torch.nn.Linear(model.classifier[6].in_features, 2)
 
@@ -45,10 +44,12 @@ model.classifier[6] = torch.nn.Linear(model.classifier[6].in_features, 2)
 NUM_EPOCHS = 10
 BEST_MODEL_PATH = 'best_model.pth'
 best_accuracy = 0.0
+lr = 0.0001 #learning rate
+print("lr =", lr)
 
-# optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 
+# Training
 for epoch in range(NUM_EPOCHS):
     
     for images, labels in iter(train_loader):
@@ -69,6 +70,7 @@ for epoch in range(NUM_EPOCHS):
     
     test_accuracy = 1.0 - float(test_error_count) / float(len(test_dataset))
     print('%d: %f' % (epoch, test_accuracy))
+    print('loss: %f' % (loss))
     if test_accuracy > best_accuracy:
         torch.save(model.state_dict(), BEST_MODEL_PATH)
         best_accuracy = test_accuracy
